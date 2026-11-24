@@ -28,6 +28,23 @@ private:
 
 void TestVersionIsThePackages(Checker& c);
 void TestSwarmCoreReachable(Checker& c);
+void TestWireRoundtrip(Checker& c);
+void TestWireFailsClosed(Checker& c);
+void TestWireFuzz(Checker& c);
+void TestEnergyUnits(Checker& c);
+void TestPackerLaunchesScoutThenQueues(Checker& c);
+void TestForwardScoutRebroadcastRule(Checker& c);
+void TestSinkAnswersEachNeighbour(Checker& c);
+void TestBackwardScoutDisjointAndLoopFree(Checker& c);
+void TestLineEndToEnd(Checker& c);
+void TestEventsQueuedDuringDiscoveryReleased(Checker& c);
+void TestPathLostWithoutSwarm(Checker& c);
+void TestIdlePathExpires(Checker& c);
+void TestDisjointPathsOnDiamond(Checker& c);
+void TestStochasticChoiceByReward(Checker& c);
+void TestEnergyFloorDropsPath(Checker& c);
+void TestTablesAreBounded(Checker& c);
+void TestDeterminism(Checker& c);
 
 struct NamedTest {
     const char* name;

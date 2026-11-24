@@ -1,10 +1,10 @@
 // Copyright (c) 2026 Daniel Joppi (https://github.com/swarm-routing)
 // SPDX-License-Identifier: MIT OR GPL-2.0-only
 //
-// BeeSensor's core: the package's entry header. The skeleton only (#41): no
-// protocol logic, which waits for the reviewed fidelity sheet
-// (docs/fidelity.md; AGENTS.md golden rule 10, #40). Includes only the C++
-// standard library and swarm-core's core/ (golden rule 11).
+// BeeSensor's core: the package's entry header. The protocol, v0 from public
+// secondary sources (docs/fidelity.md; #40), is in beesensor-router.h and
+// beesensor-wire.h. Includes only the C++ standard library and swarm-core's
+// core/ (golden rule 11).
 #ifndef BEESENSOR_CORE_H
 #define BEESENSOR_CORE_H
 

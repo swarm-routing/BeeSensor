@@ -102,6 +102,8 @@ set(BEESENSOR_WARNINGS -Wall -Wextra -Wpedantic -Wshadow -Wnon-virtual-dtor -Wol
 
 add_library(beesensor_core STATIC
   beesensor-core.cc
+  beesensor-router.cc
+  beesensor-wire.cc
 )
 add_library(beesensor::core ALIAS beesensor_core)
 # The installed package's imported target is beesensor::core too (EXPORT_NAME
@@ -122,8 +124,11 @@ target_compile_options(beesensor_core PRIVATE ${BEESENSOR_WARNINGS})
 
 if(BEESENSOR_CORE_TESTS)
   add_executable(beesensor_core_tests
+    test/all-tests.cc
     test/run-core-tests.cc
+    test/test-router.cc
     test/test-skeleton.cc
+    test/test-wire.cc
   )
   target_link_libraries(beesensor_core_tests PRIVATE beesensor_core)
   target_compile_definitions(beesensor_core_tests PRIVATE BEESENSOR_CORE_VERSION_STRING="${PROJECT_VERSION}")
@@ -140,7 +145,10 @@ if(BEESENSOR_CORE_INSTALL)
           ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
           LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
   install(FILES
+    beesensor-config.h
     beesensor-core.h
+    beesensor-router.h
+    beesensor-wire.h
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/beesensor-core)
   install(FILES LICENSE DESTINATION ${CMAKE_INSTALL_DATADIR}/doc/beesensor-core)
   install(EXPORT beesensor-coreTargets NAMESPACE beesensor:: DESTINATION ${_beesensor_core_cmake_dir})

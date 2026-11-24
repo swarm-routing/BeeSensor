@@ -13,7 +13,7 @@
 
 BeeSensor (Saleem, Ullah & Farooq, [Information Sciences 200, 2012](https://doi.org/10.1016/j.ins.2012.02.024); first published at [EvoWorkshops 2007](https://doi.org/10.1007/978-3-540-71805-5_9)), the honeybee-inspired, energy-aware routing protocol for wireless sensor networks, as a standalone swarm routing protocol: many-to-one convergecast to a sink, scored through swarm-core's energy port (`IEnergy`). It descends from [BeeAdHoc](https://github.com/swarm-routing/BeeAdHoc), the same group's protocol for mobile ad hoc networks.
 
-**Status: planned.** No protocol code yet. `core/` is an empty, tested skeleton (CMake package `beesensor-core`). The papers are closed-access, so the paper-fidelity sheet ([`docs/fidelity.md`](docs/fidelity.md)) is a v0 built from public secondary sources; the simulator-free C++ `core/` follows its review, then an ns-3 module. There is no release. The release ladder is [`docs/roadmap.md`](docs/roadmap.md); the plan is #3 and swarm-routing/.github#672.
+**Status: v0 from public secondary sources.** The papers are closed-access, so the paper-fidelity sheet ([`docs/fidelity.md`](docs/fidelity.md)) and the simulator-free C++ `core/` (CMake package `beesensor-core`) built on it are a v0 from open descriptions of BeeSensor. No claim of paper fidelity is made. The ns-3 module and the anchor come next, and there is no release. The release ladder is [`docs/roadmap.md`](docs/roadmap.md); the plan is #3 and swarm-routing/.github#672.
 
 <!-- org-sync:begin develop -->
 ## Develop
