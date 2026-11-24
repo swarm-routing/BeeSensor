@@ -7,9 +7,12 @@ as ARA, BeeAdHoc and HOPNET use it. The cross-repo release train is in the
 [org ROADMAP](https://github.com/swarm-routing/.github/blob/main/ROADMAP.md).
 Issue state is always truer than a checked-in diagram.
 
-The ladder is **proposed**: epic #3 is deferred until the maintainer re-plans
-it (decision 23 on swarm-routing/.github#672), so no release here is
-scheduled, and no issue carries a `release:` label yet. Releases are cut on
+The ladder is **proposed**. Epic #3's deferral (decision 23 on
+swarm-routing/.github#672) is lifted for setup and skeletons only
+(swarm-routing/.github#881, 2026-11-24). The fidelity sheet and the first
+`core/` are a v0 from public secondary sources, since the papers are closed
+(the same issue, 2026-11-24). No release is scheduled, and no issue carries a
+`release:` label yet. Releases are cut on
 the maintainer's request only (CONTRIBUTING "Cutting a release").
 
 ## How this plan is tracked
