@@ -11,7 +11,14 @@
 
 v0.1.0 is cut before the comparator gates (`docs/roadmap.md`). It has **not** cleared the three gates of org golden rule 6 (a fidelity sheet from its source, the per-PR delivery smoke, and an anchor reproducing the source's own trend). No result from this release counts as a benchmark number, and it does not enter the benchmarks suite until a release clears the gates; that gated release is v0.2.0.
 
-**v0, built from public secondary sources.** Both BeeSensor papers (Saleem, Ullah & Farooq 2012, https://doi.org/10.1016/j.ins.2012.02.024; Saleem & Farooq 2007, https://doi.org/10.1007/978-3-540-71805-5_9) were closed-access and unread when this release was cut, so `docs/fidelity.md` and `core/` follow open descriptions of the protocol (the org ROADMAP's "Public-source v0 protocols"). **Every row of `docs/fidelity.md` waits on the paper**: none is marked `paper`; each is `secondary: [KEY]` or `repo choice`, and all are re-checked when the paper is in hand. No claim of paper fidelity is made. It ships `core/` (MIT OR GPL-2.0-only, with `core/LICENSE`) and `docs/`, as they stand on `main` at the release commit.
+**v0, built from public secondary sources.** Both BeeSensor papers (Saleem, Ullah & Farooq 2012, https://doi.org/10.1016/j.ins.2012.02.024; Saleem & Farooq 2007, https://doi.org/10.1007/978-3-540-71805-5_9) were closed-access and unread when this release was cut, so `docs/fidelity.md` and `core/` follow open descriptions of the protocol (the org ROADMAP's "Public-source v0 protocols"). **Every row of `docs/fidelity.md` waits on the paper**: none is marked `paper`; each is `secondary: [KEY]` or `repo choice`, and all are re-checked when the paper is in hand. No claim of paper fidelity is made.
+
+The rows waiting on the paper, all of `docs/fidelity.md`:
+
+- *Mechanisms:* the four agent types; the packers; reactive route discovery; forward and backward scouts; the forward scout's fixed-size header; forward-scout rebroadcast (HL, Pi, energy minimum); the sink's conversion to a backward scout; backward scouting (node-disjoint); the node tables; point-to-point foragers by path ID; stochastic path choice by reward; the event cache; swarms; the pL energy floor; loop freedom; path maintenance; the wire header.
+- *Parameters:* HL; Pi; the scout's initial energy field; the path reward; the path choice probability; pL; FORG; the sink's forager wait; the forager TTL and forwarding-entry lifetime; the event cache size and paths per sink.
+
+It ships `core/` (MIT OR GPL-2.0-only, with `core/LICENSE`) and `docs/`, as they stand on `main` at the release commit.
 
 {% endif %}
 {% for change_key, changes in entry.changes.items() %}

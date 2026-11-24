@@ -54,7 +54,7 @@ sheet after its review; each row then names what `core/` does.
 <!-- fidelity:sources:begin -->
 | Key | Citation | Link |
 |---|---|---|
-| RF15 | RAFSANJANI & FATAMIDOKHT, *A Survey on Algorithms Based on Bee Swarms for Ad Hoc Networks*, 2015 | <https://wjst.wu.ac.th/index.php/wjst/article/view/575> |
+| RF15 | Marjan Kuchaki RAFSANJANI, *A Survey on Algorithms Based on Bee Swarms for Ad Hoc Networks*, Technical report, Walailak University, 2015 | <https://doi.org/10.14456/wjst.2015.2> |
 | SF07 | Saleem & Farooq, *BeeSensor: A Bee-Inspired Power Aware Routing Protocol for Wireless Sensor Networks*, Applications of Evolutinary Computing, pp. 81–90 | <https://doi.org/10.1007/978-3-540-71805-5_9> |
 | SUF12 | Saleem, Ullah & Farooq, *BeeSensor: An energy-efficient and scalable routing protocol for wireless sensor networks*, Information Sciences 200, 2012, pp. 38–56 | <https://doi.org/10.1016/j.ins.2012.02.024> |
 | W05 | Wedde et al., *BeeAdHoc: an energy efficient routing algorithm for mobile ad hoc networks inspired by bee behavior*, Proceedings of the 7th annual conference on Genetic and evolutionary computation, 2005, pp. 153–160 | <https://doi.org/10.1145/1068009.1068034> |
@@ -70,8 +70,8 @@ candidate*. [W05] is BeeAdHoc, cited for the lineage only.
 ## Which version of BeeSensor
 
 [SUF12] is primary (#25). The open sources describe BeeSensor without
-separating the 2007 and 2012 versions: [RF15] p. 24 cites [SUF12], while
-[ZSAC13] p. 3 and SJET20 §4.2 cite [SF07]. The sources also disagree on the
+separating the 2007 and 2012 versions: [RF15] p. 24 and [ZSAC13] p. 3 (its
+reference 16, p. 17) cite [SUF12], while SJET20 §4.2 cites [SF07]. The sources also disagree on the
 agents. [RF15] p. 24 and SJET20 §4.2 list four: packers, scouts, foragers,
 swarms. [ZSAC13] p. 3 lists three and omits swarms. v0 follows the four.
 Reading the papers settles which version each mechanism belongs to (v0.3.0,
@@ -101,12 +101,12 @@ source (rule 12).
 | Packers receive and store data packets from the transport layer and hand each to a forager (a route); no forager means no route to a sink | [RF15] p. 24 | planned (#40) | secondary: [RF15]; [ZSAC13] p. 3 ("packers locate appropriate foragers for the data packets at the source node") |
 | Route discovery is reactive, on demand: a source with an event and no route launches a forward scout carrying the event in its payload and broadcasts it | [ZSAC13] p. 3 | planned (#40) | secondary: [ZSAC13] |
 | Scouts explore new routes to a sink node, as forward and backward scouts | [RF15] p. 24; [ZSAC13] p. 3 | planned (#40) | secondary: [RF15], [ZSAC13] |
-| A forward scout carries no source route (fixed size); its header holds scout ID, source ID, minimum remaining energy (initially ∞) and hop count (initially 0) | repo choice: follows IJARCCE13 p. 2962 and SJET20 §4.2; no recorded source | planned (#40) | repo choice |
-| Forward-scout rebroadcast: an intermediate node updates its scout cache and increments the hop count; within HL hops of the source it rebroadcasts unconditionally, beyond HL with probability Pi; it lowers the energy field to its own level if lower | [ZSAC13] p. 3 | planned (#40) | secondary: [ZSAC13] for the scout cache, the hop count and the unconditional rebroadcast within a radius of the source; repo choice: the probabilistic rebroadcast beyond HL and the energy minimum follow IJARCCE13 p. 2962 |
-| The sink delivers the event, adds a forwarding entry (path ID, next hop = sink, previous hop = sender), empties the payload, resets the energy field to ∞, writes a unique path ID and turns the scout into a backward scout sent to the previous hop | repo choice: follows IJARCCE13 p. 2962; [ZSAC13] p. 3 says only that small forwarding tables are built as the scout returns | planned (#40) | repo choice |
+| A forward scout carries no source route (fixed size); its header holds scout ID, source ID, minimum remaining energy (initially ∞) and hop count (initially 0) | repo choice: follows IJARCCE13 pp. 2962–2963 (no source route, p. 2962; the header fields, p. 2963) and SJET20 §4.2; no recorded source | planned (#40) | repo choice |
+| Forward-scout rebroadcast: an intermediate node updates its scout cache and increments the hop count; within HL hops of the source it rebroadcasts unconditionally, beyond HL with probability Pi; it lowers the energy field to its own level if lower | [ZSAC13] p. 3 | planned (#40) | secondary: [ZSAC13] for the scout cache, the hop count and the unconditional rebroadcast within a radius of the source; repo choice: the probabilistic rebroadcast beyond HL and the energy minimum follow IJARCCE13 p. 2963 |
+| The sink delivers the event, adds a forwarding entry (path ID, next hop = sink, previous hop = sender), empties the payload, resets the energy field to ∞, writes a unique path ID and turns the scout into a backward scout sent to the previous hop | repo choice: follows IJARCCE13 p. 2963; [ZSAC13] p. 3 says only that small forwarding tables are built as the scout returns | planned (#40) | repo choice |
 | Backward scouting: each node on the way back adds a forwarding entry from its scout cache, accepts only the first backward scout of a generation (paths node-disjoint), lowers the energy field, and forwards to the previous hop | [ZSAC13] p. 3 | planned (#40) | secondary: [ZSAC13] for the forwarding tables built during the scout's return; repo choice: disjointness and the per-generation rule follow IJARCCE13 p. 2963 |
-| Node tables: the source keeps a routing table and a probability distribution table; sink and intermediate nodes keep forwarding tables (path ID, next hop, previous hop) | repo choice: follows IJARCCE13 p. 2962 | planned (#40) | repo choice |
-| Foragers carry data point-to-point along a path, indexed by path ID (PID) in the forwarding tables; foragers of one path are grouped | [RF15] p. 24; [ZSAC13] p. 3 | planned (#40) | secondary: [RF15], [ZSAC13]; the PID indexing follows SJET20 §4.2 |
+| Node tables: the source keeps a routing table and a probability distribution table; sink and intermediate nodes keep forwarding tables (path ID, next hop, previous hop) | repo choice: follows IJARCCE13 p. 2963 | planned (#40) | repo choice |
+| Foragers carry data point-to-point along a path, indexed by path ID (PID) in the forwarding tables; foragers of one path are grouped | [RF15] p. 24; [ZSAC13] p. 3 | planned (#40) | secondary: [RF15], [ZSAC13] for point-to-point foragers; repo choice: the PID indexing and the grouping follow SJET20 §4.2 and IJARCCE13 p. 2963 (no bibliographic record) |
 | Path choice at the source is stochastic, by a reward of path length (hops) and the least residual energy on the path | repo choice: follows IJARCCE13 pp. 2962–2963 and SJET20 §4.2 ("selected stochastically at the source node"); the reward's form is a repo choice (Parameters) | planned (#40) | repo choice |
 | Events generated during route discovery wait in a small event cache at the source | repo choice: follows IJARCCE13 p. 2963 | planned (#40) | repo choice |
 | Swarms return foragers to the source when they are not piggy-backed on link-layer acknowledgements; foragers wait at the sink, then travel back as one swarm on the reverse links | [RF15] p. 24 | planned (#40); no link-layer piggy-back in v0 (the adapter has no hook for it): every return is a swarm | secondary: [RF15]; detail follows SJET20 §4.2; deviation: no piggy-back |
@@ -119,10 +119,10 @@ source (rule 12).
 
 | Parameter | Value | Source | Notes |
 |---|---|---|---|
-| HL, the hop radius of unconditional forward-scout rebroadcast | 2 | repo choice: IJARCCE13 p. 2964 ("nodes … located beyond 2 hops perform stochastic broadcasting"); its Fig. 2 shows HL = 3 as an example | repo choice; IJARCCE13 p. 2962 proposes HL as a function of the estimated source–sink hops (not in v0) |
+| HL, the hop radius of unconditional forward-scout rebroadcast | 2 | repo choice: IJARCCE13 p. 2964 ("nodes … located beyond 2 hops perform stochastic broadcasting"); its Fig. 2 shows HL = 3 as an example | repo choice; IJARCCE13 p. 2963 proposes HL as a function of the estimated source–sink hops (not in v0) |
 | Pi, rebroadcast probability beyond HL | 0.5 | repo choice: no open source gives a value | repo choice; to be measured by A/B |
-| Initial minimum-energy field of a scout | ∞ (residual fraction > 1) | repo choice: IJARCCE13 p. 2962 | repo choice; energy is swarm-core `IEnergy`'s residual fraction in [0, 1], NaN when unknown |
-| Path reward | r = E_min / hops | repo choice: IJARCCE13 p. 2962 says only "a function of the path length (hops) and the least energy level of a node on the path" | repo choice; a NaN energy (no model) scores as 1, so the reward falls back to 1/hops |
+| Initial minimum-energy field of a scout | ∞ (residual fraction > 1) | repo choice: IJARCCE13 p. 2963 | repo choice; energy is swarm-core `IEnergy`'s residual fraction in [0, 1], NaN when unknown |
+| Path reward | r = E_min / hops | repo choice: IJARCCE13 p. 2962 says only "a function of the path length (hops) and the least energy level of a node on the path" | repo choice; E_min is the least known reading on the path: an unknown (NaN, no energy model) reading leaves the running minimum unchanged, and a minimum still at its ∞ start value when the path is scored counts as 1. So an unknown reading acts as 1 (a full battery), and a path with no known reading scores 1/hops, never ∞ |
 | Path choice probability | p_k = r_k / Σ r | repo choice: SJET20 §4.2 says "selected stochastically"; the distribution is ours | repo choice |
 | pL, energy floor below which a swarm does not advertise a path | 0.1 | repo choice: IJARCCE13 p. 2962 names pL, no value | repo choice |
 | FORG, wait before removing a path with no foragers | 1 s | repo choice: IJARCCE13 p. 2964 names it, no value | repo choice |
