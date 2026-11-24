@@ -7,9 +7,16 @@ before changing anything. Org-wide conventions:
 
 ## What this repo is
 
-**Status: planned (swarm-routing/.github#672).** Nothing is built yet: the plan is #3.
+**Status: fidelity sheet in progress (Phase 3b, swarm-routing/.github#672).** No protocol code yet: epic #3 is deferred until the maintainer re-plans it (decision 23 on swarm-routing/.github#672), and the fidelity sheet comes first (rule 10). Both sources are closed-access, so most rows of `docs/fidelity.md` read `unknown` until they are read (#25).
 
-BeeSensor, the honeybee-inspired, energy-aware routing protocol for wireless sensor networks, as a standalone swarm routing protocol: many-to-one convergecast to a sink, scored through swarm-core's `IEnergyProvider` port, reusing the energy-aware patterns of BeeAdHoc.
+BeeSensor (Saleem, Ullah & Farooq, [Information Sciences 200, 2012](https://doi.org/10.1016/j.ins.2012.02.024); first published at [EvoWorkshops 2007](https://doi.org/10.1007/978-3-540-71805-5_9)), the honeybee-inspired, energy-aware routing protocol for wireless sensor networks, as a standalone swarm routing protocol: many-to-one convergecast to a sink, scored through swarm-core's energy port (`IEnergy`). It comes from the same group and lineage as BeeAdHoc (swarm-routing/BeeAdHoc), adapted from MANETs to sensor networks.
+
+```
+core/       (planned) simulator-agnostic algorithm + unit tests (no simulator headers; MIT OR GPL-2.0-only, core/LICENSE),
+            on swarm-core's dual-licensed core/ through its vcpkg port; installs as the CMake package beesensor-core
+ns3/        (planned) the ns-3 contrib module `beesensor` (GPL-2.0-only)
+docs/       fidelity.md (the paper-fidelity sheet), references.bib, roadmap.md (the release ladder), adr/, rcapa/
+```
 
 ## Build & verify
 
@@ -126,6 +133,10 @@ Org-wide (1–9), then this repo's own.
 9. **Nothing shipped depends on `.claude/`.** Skills hold procedures; scripts
    that anything shipped needs live in `tools/` (AntHocNet ADR-0014).
 <!-- org-sync:end org-rules -->
+10. **Fidelity sheet before code.** No protocol code lands in `core/` or `ns3/` until `docs/fidelity.md` has been reviewed by the maintainer. Every mechanism and parameter cites its paper section ([SUF12], the version this repository implements; [SF07] for deviations), or is marked `repo choice: <reason>` or `unknown`; a closed paper not yet read leaves its rows `unknown`, never a value from memory or from another protocol.
+11. **`core/` never includes a simulator header.** It includes only the C++ standard library, its own files and swarm-core's dual-licensed `core/` (through its vcpkg port, at the release `swarm-core.lock` names); the energy it scores comes in through swarm-core's energy port (`IEnergy`, `swarm-ports.h`). The ns-3 adapter only converts headers, executes `RouteDecision`s and owns timers/queues (AntHocNet golden rules 1–2).
+12. **Written fresh; BeeAdHoc is a sibling, not a source.** No AntHocNet arm exists for BeeSensor, so `core/` (dual) is original work. BeeSensor descends from BeeAdHoc (swarm-routing/BeeAdHoc): reusing a BeeAdHoc pattern means citing [SUF12] for it in the fidelity sheet, and code copied from BeeAdHoc keeps BeeAdHoc's licence and provenance. Paper copies stay in a private paper store the maintainer keeps, never in this public repository: cite by DOI link.
+13. **The scenario is the WSN convergecast family.** Benchmarks run sim-tools' many-to-one WSN convergecast family (swarm-routing/sim-tools#55; battery through ns-3's `EnergySource` and swarm-core's energy port), never the ruled-out sub-GHz duty-cycled mesh (swarm-routing/AntHocNet#858); a family changes the scenario, never this protocol's defaults (AntHocNet ADR-0019).
 
 ## Conventions
 
@@ -362,4 +373,9 @@ chat, not the record.
 |--------------|-------|
 | The org's invariants, labels, issue shape | [`swarm-routing/.github` CONTRIBUTING.md](https://github.com/swarm-routing/.github/blob/main/CONTRIBUTING.md) |
 | Record an architecture decision | [`docs/adr/`](docs/adr/) (`0000-template.md`) |
+| Know which release a piece of work serves, or why something is not planned | [`docs/roadmap.md`](docs/roadmap.md): the release ladder v0.1.0 → v1.0.0, exit criteria, non-goals; issues carry `release:` labels |
+| What the paper specifies, and where this implementation departs from it | [`docs/fidelity.md`](docs/fidelity.md), its sources in [`docs/references.bib`](docs/references.bib) |
+| The sibling protocol BeeSensor descends from | [`swarm-routing/BeeAdHoc`](https://github.com/swarm-routing/BeeAdHoc) (`docs/fidelity.md`, `core/`) |
+| Shared primitives (energy port, router observer, wire readers) | [`swarm-routing/swarm-core`](https://github.com/swarm-routing/swarm-core), consumed by release (`swarm-core.lock`, its vcpkg port) |
+| The benchmark scenario family | swarm-routing/sim-tools#55 (many-to-one WSN convergecast) |
 | Pick up open work | this repo's issues — highest open `priority:P*` first; newest open `handoff` issue for work in flight |

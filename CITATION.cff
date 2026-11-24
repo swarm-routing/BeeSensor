@@ -1,0 +1,44 @@
+# Citation File Format (https://citation-file-format.github.io), seeded by
+# swarm-routing/.github org-sync (`citation = true`; `citation_type` and
+# `[[references]]` in .github/org-sync.toml); the repository's own once
+# written. Commitizen keeps `version:` in step (`.cz.toml` version_files
+# "CITATION.cff:^version:"); swarm-routing/.github tools/zenodo reads the
+# concept DOI from `doi:` once the first release is archived on Zenodo.
+cff-version: 1.2.0
+message: "If you use this software, please cite it using the metadata below."
+title: "BeeSensor"
+abstract: >-
+  BeeSensor (Saleem, Ullah & Farooq, 2012), the honeybee-inspired energy-aware
+  routing protocol for wireless sensor networks, as a standalone swarm routing
+  protocol: many-to-one convergecast to a sink, planned as a
+  simulator-agnostic C++ core and an ns-3 contrib module on swarm-core, with a
+  paper-fidelity sheet.
+type: software
+authors:
+  - family-names: Joppi
+    given-names: Daniel Henrique
+    orcid: "https://orcid.org/0009-0009-6436-8174"
+version: "0.0.0"
+# The work as a whole; core/ also MIT OR GPL-2.0-only (LICENSING.md).
+license: GPL-2.0-only
+repository-code: "https://github.com/swarm-routing/BeeSensor"
+url: "https://github.com/swarm-routing/BeeSensor"
+references:
+  - type: article
+    title: "BeeSensor: An energy-efficient and scalable routing protocol for wireless sensor networks"
+    authors:
+      - family-names: "Saleem"
+        given-names: "Muhammad"
+      - family-names: "Ullah"
+        given-names: "Israr"
+      - family-names: "Farooq"
+        given-names: "Muddassar"
+    journal: "Information Sciences"
+    volume: "200"
+    start: "38"
+    end: "56"
+    year: 2012
+    publisher:
+      name: "Elsevier BV"
+    doi: "10.1016/j.ins.2012.02.024"
+    notes: "The version this repository implements: the full protocol and its WSN evaluation, the primary source of docs/fidelity.md."
