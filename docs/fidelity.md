@@ -9,9 +9,12 @@ Every row cites its source (`[KEY] §x`, `p. N`, `Table N`, `Fig. N`), or says
 [SUF12] (the version this repository implements) and [SF07], are
 closed-access (OpenAlex, Semantic Scholar and Unpaywall list no open copy,
 checked 2026-11-24), and neither has been read for this sheet. Under the
-maintainer's decision of 2026-11-24 on swarm-routing/.github#881 (protocols
-without an open paper are built first from public sources), the rows below
-are filled from open descriptions of BeeSensor. Each row says where it comes
+maintainer's decision of 2026-11-24
+(<https://github.com/swarm-routing/.github/issues/881#issuecomment-7147077907>;
+org ROADMAP "Public-source v0 protocols": a protocol without an open paper
+is built first from public sources), the rows below are filled from open
+descriptions of BeeSensor. When the paper is in hand, every row is
+re-checked against it and each deviation recorded. Each row says where it comes
 from:
 
 - `paper`: read in [SUF12] or [SF07]. **No row is `paper` yet.**

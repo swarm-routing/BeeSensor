@@ -12,9 +12,12 @@ carries the org templates, the release ladder
 tested `core/` skeleton (package `beesensor-core`), and the fidelity sheet
 ([`docs/fidelity.md`](docs/fidelity.md)). Epic #3 was deferred on 2026-11-22
 (decision 23 on swarm-routing/.github#672); the maintainer lifted that
-deferral for setup and skeletons on 2026-11-24 (swarm-routing/.github#881).
+deferral for setup and a building, tested skeleton on 2026-11-24
+(https://github.com/swarm-routing/.github/issues/881#issuecomment-7147054971).
 The same day the maintainer decided that a protocol without an open paper is
-built first from public sources. BeeSensor's sheet is therefore a v0 from
+built first from public sources
+(https://github.com/swarm-routing/.github/issues/881#issuecomment-7147077907;
+both are in the org ROADMAP, decision 23 as amended). BeeSensor's sheet is therefore a v0 from
 open secondary descriptions, and `core/` follows it after review (#40). The
 anchor gate stays open and there is no release.
 

@@ -8,12 +8,16 @@ as ARA, BeeAdHoc and HOPNET use it. The cross-repo release train is in the
 Issue state is always truer than a checked-in diagram.
 
 The ladder is **proposed**. Epic #3's deferral (decision 23 on
-swarm-routing/.github#672) is lifted for setup and skeletons only
-(swarm-routing/.github#881, 2026-11-24). The fidelity sheet and the first
+swarm-routing/.github#672) is lifted for setup and a building, tested
+skeleton only
+([2026-11-24](https://github.com/swarm-routing/.github/issues/881#issuecomment-7147054971);
+the org ROADMAP, decision 23 as amended). The fidelity sheet and the first
 `core/` are a v0 from public secondary sources, since the papers are closed
-(the same issue, 2026-11-24). No release is scheduled, and no issue carries a
-`release:` label yet. Releases are cut on
-the maintainer's request only (CONTRIBUTING "Cutting a release").
+([2026-11-24](https://github.com/swarm-routing/.github/issues/881#issuecomment-7147077907)).
+v0.1.0 is cut only on the maintainer's word, and its release notes say it is
+v0 from secondary sources and list the rows that wait on the paper. No release
+is scheduled, and no issue carries a `release:` label yet. Releases are cut
+on the maintainer's request only (CONTRIBUTING "Cutting a release").
 
 ## How this plan is tracked
 
