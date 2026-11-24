@@ -69,7 +69,7 @@ shares, reusing that code keeps its licence and provenance (golden rule 12).
 |---|---|---|---|
 | Route discovery towards the sink: which agent explores, who starts it, when | unknown | — | unknown: not read (#25) |
 | Data delivery from a sensor to the sink along the discovered paths | unknown | — | unknown: not read (#25) |
-| Path scoring: how remaining energy and path length (or other metrics) weigh a route; the epic's "scout admission floor" and "sink path scoring" | unknown | — | unknown: not read (#25); the energy reaches `core/` through swarm-core's `IEnergyProvider` |
+| Path scoring: how remaining energy and path length (or other metrics) weigh a route; the epic's "scout admission floor" and "sink path scoring" | unknown | — | unknown: not read (#25); the energy reaches `core/` through swarm-core's energy port (`IEnergy`) |
 | Route maintenance: refresh, expiry and the response to a broken link or a depleted node | unknown | — | unknown: not read (#25) |
 | Per-node state: what a node stores, and its bounds (golden rule 7) | unknown | — | unknown: not read (#25) |
 | Control packets and their fields (the wire header, golden rule 3) | unknown | — | unknown: not read (#25) |
