@@ -16,7 +16,7 @@ BUILD_ARGS ?=
 # swarm-core's core/ at the release swarm-core.lock names (its tag): the include
 # check's dependency, and core-test's swarm-core when no vcpkg is given.
 SWARM_CORE_SRC ?= $(HOME)/.cache/swarm-routing/swarm-core
-SWARM_CORE_REF ?= v2.0.0
+SWARM_CORE_REF ?= v2.1.0
 
 .DEFAULT_GOAL := help
 .PHONY: help build test lint format check clean shell ci headers core-test swarm-core
