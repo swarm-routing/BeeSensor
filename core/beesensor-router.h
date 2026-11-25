@@ -57,8 +57,11 @@ struct Path {
     std::uint8_t hops = 0;
     std::uint16_t energy = kEnergyUnset;
     std::uint32_t outstanding = 0;  ///< foragers sent, not yet back
-    Time oldestOutstanding = 0;     ///< when the oldest of them left
-    Time lastActive = 0;            ///< last forager sent or returned
+    /// When FORG starts counting: the first send while none was out, then each
+    /// swarm's arrival. A path that keeps returning foragers survives a lost
+    /// one; one with foragers out and no return for FORG is removed.
+    Time oldestOutstanding = 0;
+    Time lastActive = 0;  ///< last forager sent or returned
 };
 
 /// The path reward (fidelity.md, Parameters: path reward): least residual
@@ -101,6 +104,8 @@ public:
     std::size_t forwardingEntries() const { return forwarding_.size(); }
     std::size_t scoutCacheEntries() const { return scoutCache_.size(); }
     std::size_t queuedEvents() const { return queuedEvents_; }
+    /// Forager groups waiting at this sink for their swarm.
+    std::size_t waitingGroups() const { return waiting_.size(); }
     bool searching() const { return searching_; }
 
 private:
@@ -118,6 +123,7 @@ private:
         Time at = 0;
     };
     struct Waiting {
+        swarm::core::TimerHandle timer = swarm::core::kNoTimer;  ///< the swarm's departure
         NodeAddress source = swarm::core::kInvalidAddress;
         std::uint16_t foragers = 0;
         std::uint8_t hops = 0;
@@ -135,6 +141,12 @@ private:
     ForwardScout newScout();
     void rememberScout(const GenKey& key, NodeAddress from);
     void addForwarding(const PathKey& key, const Forwarding& f);
+    /// Erases a forwarding entry with the sink's foragers waiting on it and
+    /// their swarm timer; returns the next entry.
+    std::map<PathKey, Forwarding>::iterator
+    eraseForwarding(std::map<PathKey, Forwarding>::iterator it);
+    void armRetry();
+    void onRetry();
     void sendSwarm(PathKey key);
     void sent(Kind kind, bool broadcast);
     void received(Kind kind);
@@ -156,11 +168,11 @@ private:
     bool searching_ = false;
     Time searchStarted_ = 0;
     std::size_t queuedEvents_ = 0;
+    bool retryArmed_ = false;  ///< one scout-retry timer at a time
     // every node
     std::map<GenKey, ScoutEntry> scoutCache_;
     std::deque<GenKey> scoutOrder_;
-    std::map<PathKey, Forwarding> forwarding_;
-    std::deque<PathKey> forwardingOrder_;
+    std::map<PathKey, Forwarding> forwarding_;  ///< at most forwardingTableSize
     // sink
     std::uint32_t nextPathId_ = 1;
     std::map<GenKey, SinkGeneration> sinkGenerations_;

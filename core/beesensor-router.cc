@@ -70,11 +70,13 @@ void Router::expirePaths() {
 void Router::expire() {
     expirePaths();
     const Time t = now();
-    while (!forwardingOrder_.empty()) {
-        auto it = forwarding_.find(forwardingOrder_.front());
-        if (it != forwarding_.end() && t - it->second.at <= config_.forwardingLifetime) break;
-        if (it != forwarding_.end()) forwarding_.erase(it);
-        forwardingOrder_.pop_front();
+    // every entry is checked: a refresh moves an entry's time, not its place
+    for (auto it = forwarding_.begin(); it != forwarding_.end();) {
+        if (t - it->second.at > config_.forwardingLifetime) {
+            it = eraseForwarding(it);
+        } else {
+            ++it;
+        }
     }
     while (!scoutOrder_.empty()) {
         auto it = scoutCache_.find(scoutOrder_.front());
@@ -139,6 +141,7 @@ EventDecision Router::onEvent() {
     }
     if (queuedEvents_ >= config_.eventCacheSize) return {Decision::drop()};
     ++queuedEvents_;
+    armRetry();  // a new forward scout after the timeout, if no path comes
     return {Decision{RouteAction::Queue, swarm::core::kInvalidAddress, std::nullopt}};
 }
 
@@ -153,13 +156,47 @@ void Router::rememberScout(const GenKey& key, NodeAddress from) {
     scoutOrder_.push_back(key);
 }
 
+std::map<Router::PathKey, Router::Forwarding>::iterator
+Router::eraseForwarding(std::map<PathKey, Forwarding>::iterator it) {
+    // a sink's foragers waiting on this path go with it, and so does their swarm timer
+    if (auto w = waiting_.find(it->first); w != waiting_.end()) {
+        timers_.cancel(w->second.timer);
+        waiting_.erase(w);
+    }
+    return forwarding_.erase(it);
+}
+
 void Router::addForwarding(const PathKey& key, const Forwarding& f) {
-    if (forwarding_.size() >= config_.forwardingTableSize && !forwardingOrder_.empty()) {
-        forwarding_.erase(forwardingOrder_.front());
-        forwardingOrder_.pop_front();
+    if (auto existing = forwarding_.find(key); existing != forwarding_.end()) {
+        eraseForwarding(existing);
+    }
+    if (forwarding_.size() >= config_.forwardingTableSize) {
+        // the least recently used entry goes first (golden rule 7)
+        auto oldest = std::min_element(
+            forwarding_.begin(), forwarding_.end(),
+            [](const auto& a, const auto& b) { return a.second.at < b.second.at; });
+        eraseForwarding(oldest);
     }
     forwarding_[key] = f;
-    forwardingOrder_.push_back(key);
+}
+
+void Router::armRetry() {
+    if (retryArmed_) return;
+    retryArmed_ = true;
+    const Time due = std::max<Time>(0.0, searchStarted_ + config_.scoutTimeout - now());
+    timers_.schedule(due, [this] { onRetry(); });
+}
+
+void Router::onRetry() {
+    retryArmed_ = false;
+    expire();
+    if (queuedEvents_ == 0 || !paths_.empty()) return;  // nothing waits, or a path came
+    if (now() - searchStarted_ >= config_.scoutTimeout) {
+        // the waiting events stay in the adapter's queue; the scout carries none
+        const ForwardScout s = newScout();
+        if (controlSink_) controlSink_(Decision::broadcast(s));
+    }
+    armRetry();
 }
 
 std::vector<Decision> Router::onForwardScout(const ForwardScout& scout, NodeAddress from) {
@@ -258,9 +295,9 @@ Decision Router::onBackwardScout(const BackwardScout& scout, NodeAddress from) {
         return Decision::none();
     }
 
-    if (forwarding_.contains(key)) {
+    if (auto loop = forwarding_.find(key); loop != forwarding_.end()) {
         // a second visit: a loop; drop it and flush the entry ([IJARCCE13] p. 2963)
-        forwarding_.erase(key);
+        eraseForwarding(loop);
         return Decision::drop();
     }
     auto cached = scoutCache_.find(gen);
@@ -296,7 +333,10 @@ Decision Router::onData(DataHeader& header, NodeAddress /*from*/) {
         if (w->second.foragers < 0xFFFF) ++w->second.foragers;
         w->second.hops = std::max(w->second.hops, header.hops);
         w->second.energy = minEnergy(w->second.energy, header.energy);
-        if (fresh) timers_.schedule(config_.sinkSwarmWait, [this, key] { sendSwarm(key); });
+        if (fresh) {
+            w->second.timer =
+                timers_.scheduleCancellable(config_.sinkSwarmWait, [this, key] { sendSwarm(key); });
+        }
         if (observer_) observer_->onDataDecision(header.sink, RouteAction::Deliver);
         return Decision::deliver();
     }

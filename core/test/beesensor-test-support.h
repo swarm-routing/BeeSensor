@@ -51,21 +51,38 @@ class FakeTimers : public swarm::core::ITimerScheduler {
 public:
     explicit FakeTimers(FakeClock& clock) : clock_(clock) {}
     void schedule(Time delay, std::function<void()> callback) override {
-        pending_.emplace(clock_.t + delay, std::move(callback));
+        pending_.emplace(clock_.t + delay, Entry{swarm::core::kNoTimer, std::move(callback)});
     }
+    swarm::core::TimerHandle scheduleCancellable(Time delay,
+                                                 std::function<void()> callback) override {
+        const swarm::core::TimerHandle h = ++lastHandle_;
+        pending_.emplace(clock_.t + delay, Entry{h, std::move(callback)});
+        return h;
+    }
+    void cancel(swarm::core::TimerHandle timer) override {
+        if (timer == swarm::core::kNoTimer) return;
+        std::erase_if(pending_, [&](const auto& kv) { return kv.second.handle == timer; });
+    }
+    /// Timers scheduled and not yet run or cancelled.
+    std::size_t pending() const { return pending_.size(); }
     /// Runs every timer due by `until`, in deadline order, moving the clock.
     void advance(Time until) {
         while (!pending_.empty() && pending_.begin()->first <= until) {
             auto node = pending_.extract(pending_.begin());
             clock_.t = node.key();
-            node.mapped()();
+            node.mapped().callback();
         }
         clock_.t = until;
     }
 
 private:
+    struct Entry {
+        swarm::core::TimerHandle handle = swarm::core::kNoTimer;
+        std::function<void()> callback;
+    };
     FakeClock& clock_;
-    std::multimap<Time, std::function<void()>> pending_;
+    std::multimap<Time, Entry> pending_;
+    swarm::core::TimerHandle lastHandle_ = swarm::core::kNoTimer;
 };
 
 class FakeEnergy : public swarm::core::IEnergy {
@@ -125,6 +142,9 @@ public:
             }
         }
     }
+
+    /// Loses every message in flight (a lossy link).
+    void dropQueued() { queue_.clear(); }
 
     /// Advances the clock, firing timers, and runs the network.
     void advance(Time until) {

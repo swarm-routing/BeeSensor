@@ -257,4 +257,109 @@ void TestDeterminism(Checker& c) {
     c.expect(!a.empty() && a[0] >= 45, "and the grid delivers nearly every event");
 }
 
+namespace {
+
+// Gives `s` (a relay, node 10) the forwarding entry of path `pathId` towards
+// sink 9, from a generation `gen` that source 0 scouted.
+void relayPath(Solo& s, std::uint32_t gen, std::uint32_t pathId) {
+    s.router.onForwardScout(ForwardScout{gen, 0, 0, kEnergyUnset}, 0);
+    s.router.onBackwardScout(BackwardScout{gen, 0, 9, pathId, 3, kEnergyUnset}, 8);
+}
+
+}  // namespace
+
+void TestForwardingExpiryIgnoresRefreshOrder(Checker& c) {
+    Solo s;
+    relayPath(s, 1, 11);  // A at t = 0
+    s.clock.t = 1;
+    relayPath(s, 2, 12);  // B at t = 1
+    s.clock.t = 2;
+    DataHeader a{0, 9, 11, 1, kEnergyUnset};
+    s.router.onData(a, 0);  // A refreshed at t = 2
+    s.clock.t = 31.5;       // B (t = 1) is past the 30 s lifetime, A (t = 2) is not
+    DataHeader b{0, 9, 12, 1, kEnergyUnset};
+    c.expect(s.router.onData(b, 0).action == RouteAction::Drop,
+             "an expired entry behind a refreshed one is expired too");
+    DataHeader a2{0, 9, 11, 1, kEnergyUnset};
+    c.expect(s.router.onData(a2, 0).action == RouteAction::Unicast, "the refreshed entry lives");
+}
+
+void TestForwardingCapHoldsAfterLoopFlush(Checker& c) {
+    Config config;
+    config.forwardingTableSize = 2;
+    Solo s(false, config);
+    relayPath(s, 1, 11);                                                       // A
+    relayPath(s, 2, 12);                                                       // B
+    s.router.onBackwardScout(BackwardScout{2, 0, 9, 12, 3, kEnergyUnset}, 8);  // B flushed (loop)
+    relayPath(s, 3, 13);                                                       // C
+    relayPath(s, 4, 14);                                                       // D evicts A
+    relayPath(s, 5, 15);  // E must evict a live entry, not B's stale key
+    c.expect(s.router.forwardingEntries() <= 2,
+             "the forwarding table keeps its cap after a loop flush (" +
+                 std::to_string(s.router.forwardingEntries()) + " entries)");
+}
+
+void TestScoutRetriedWhileEventsWait(Checker& c) {
+    Solo s;
+    std::vector<Decision> sent;
+    s.router.setControlSink([&](const Decision& d) { sent.push_back(d); });
+    const auto first = s.router.onEvent().decision;
+    c.expect(first.action == RouteAction::Broadcast, "the first event scouts");
+    c.expect(s.router.onEvent().decision.action == RouteAction::Queue, "the second waits");
+    s.timers.advance(Config{}.scoutTimeout + 0.01);
+    c.expect(sent.size() == 1 && sent[0].action == RouteAction::Broadcast &&
+                 std::holds_alternative<ForwardScout>(*sent[0].message),
+             "with events waiting and no path, a new forward scout leaves after the timeout");
+    if (!sent.empty() && sent[0].message) {
+        c.expect(std::get<ForwardScout>(*sent[0].message).scoutId !=
+                     std::get<ForwardScout>(*first.message).scoutId,
+                 "as a new generation");
+    }
+    c.expect(s.router.queuedEvents() == 1, "the retry adds no event to the cache");
+}
+
+void TestNoScoutRetryWithoutWaitingEvents(Checker& c) {
+    Solo s;
+    std::vector<Decision> sent;
+    s.router.setControlSink([&](const Decision& d) { sent.push_back(d); });
+    s.router.onEvent();  // the scout carries the only event; nothing waits
+    s.timers.advance(5.0);
+    c.expect(sent.empty(), "no event waits: no retry");
+}
+
+void TestSinkSwarmGroupsBounded(Checker& c) {
+    Config config;
+    config.forwardingTableSize = 2;
+    Solo s(true, config);
+    for (std::uint32_t g = 1; g <= 20; ++g) {
+        auto out = s.router.onForwardScout(ForwardScout{g, 0, 2, kEnergyUnset}, 5);
+        if (out.size() < 2 || !out[1].message) continue;
+        const auto& b = std::get<BackwardScout>(*out[1].message);
+        DataHeader h{0, b.sink, b.pathId, 2, kEnergyUnset};
+        s.router.onData(h, 5);
+    }
+    c.expect(s.router.waitingGroups() <= 2,
+             "pending swarm groups follow the forwarding table's cap (" +
+                 std::to_string(s.router.waitingGroups()) + ")");
+    c.expect(s.timers.pending() <= 2, "and their swarm timers are cancelled with them (" +
+                                          std::to_string(s.timers.pending()) + " pending)");
+}
+
+void TestForgMeasuredFromLastReturn(Checker& c) {
+    Net net(5, kLine, {4});
+    net.event(0);
+    net.run();
+    net.event(0);  // forager 1: lost (the queue is cleared, never delivered)
+    net.dropQueued();
+    net.event(0);  // forager 2: arrives
+    net.run();
+    net.advance(0.6);  // forager 2 returns in a swarm; forager 1 stays out
+    net.advance(1.3);  // past FORG from forager 1's send, within FORG of the return
+    c.expect(net.at(0).paths().size() == 1,
+             "a path that keeps returning foragers survives one lost forager");
+    net.advance(1.7);  // past FORG from the last return, forager 1 still out
+    c.expect(net.at(0).paths().empty(),
+             "with no return for FORG while foragers are out, the path is removed");
+}
+
 }  // namespace beesensor::core::test

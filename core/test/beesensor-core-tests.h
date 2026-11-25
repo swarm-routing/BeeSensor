@@ -45,6 +45,12 @@ void TestStochasticChoiceByReward(Checker& c);
 void TestEnergyFloorDropsPath(Checker& c);
 void TestTablesAreBounded(Checker& c);
 void TestDeterminism(Checker& c);
+void TestForwardingExpiryIgnoresRefreshOrder(Checker& c);
+void TestForwardingCapHoldsAfterLoopFlush(Checker& c);
+void TestScoutRetriedWhileEventsWait(Checker& c);
+void TestNoScoutRetryWithoutWaitingEvents(Checker& c);
+void TestSinkSwarmGroupsBounded(Checker& c);
+void TestForgMeasuredFromLastReturn(Checker& c);
 
 struct NamedTest {
     const char* name;

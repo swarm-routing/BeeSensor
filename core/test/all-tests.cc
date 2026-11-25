@@ -10,7 +10,7 @@ namespace beesensor::core::test {
 
 namespace {
 
-constexpr std::array<NamedTest, 19> kTests{{
+constexpr std::array<NamedTest, 25> kTests{{
     {"skeleton: version() is the package's", TestVersionIsThePackages},
     {"skeleton: swarm-core's energy port is reachable", TestSwarmCoreReachable},
     {"wire: roundtrip, sizes, little-endian", TestWireRoundtrip},
@@ -31,6 +31,13 @@ constexpr std::array<NamedTest, 19> kTests{{
     {"swarm: a path below pL is dropped when a better one exists", TestEnergyFloorDropsPath},
     {"bounds: the scout cache keeps its cap", TestTablesAreBounded},
     {"determinism: a fixed seed repeats", TestDeterminism},
+    {"forwarding: expiry is not blocked by a refreshed entry",
+     TestForwardingExpiryIgnoresRefreshOrder},
+    {"forwarding: the cap holds after a loop flush", TestForwardingCapHoldsAfterLoopFlush},
+    {"scouting: retried on a timer while events wait", TestScoutRetriedWhileEventsWait},
+    {"scouting: no retry when no event waits", TestNoScoutRetryWithoutWaitingEvents},
+    {"sink: pending swarm groups and their timers are bounded", TestSinkSwarmGroupsBounded},
+    {"maintenance: FORG runs from the last return", TestForgMeasuredFromLastReturn},
 }};
 
 }  // namespace
