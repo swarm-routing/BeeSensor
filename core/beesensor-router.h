@@ -123,7 +123,7 @@ private:
         Time at = 0;
     };
     struct Waiting {
-        swarm::core::TimerHandle timer = swarm::core::kNoTimer;  ///< the swarm's departure
+        Time due = 0;  ///< when the swarm leaves: the first forager's arrival + sinkSwarmWait
         NodeAddress source = swarm::core::kInvalidAddress;
         std::uint16_t foragers = 0;
         std::uint8_t hops = 0;
@@ -141,13 +141,15 @@ private:
     ForwardScout newScout();
     void rememberScout(const GenKey& key, NodeAddress from);
     void addForwarding(const PathKey& key, const Forwarding& f);
-    /// Erases a forwarding entry with the sink's foragers waiting on it and
-    /// their swarm timer; returns the next entry.
+    /// Erases a forwarding entry with the sink's foragers waiting on it;
+    /// returns the next entry.
     std::map<PathKey, Forwarding>::iterator
     eraseForwarding(std::map<PathKey, Forwarding>::iterator it);
     void armRetry();
     void onRetry();
     void sendSwarm(PathKey key);
+    void armSwarmTimer();
+    void onSwarmTimer();
     void sent(Kind kind, bool broadcast);
     void received(Kind kind);
 
@@ -168,7 +170,8 @@ private:
     bool searching_ = false;
     Time searchStarted_ = 0;
     std::size_t queuedEvents_ = 0;
-    bool retryArmed_ = false;  ///< one scout-retry timer at a time
+    bool retryArmed_ = false;       ///< one scout-retry timer at a time
+    bool swarmTimerArmed_ = false;  ///< one swarm timer at a time, for every waiting group
     // every node
     std::map<GenKey, ScoutEntry> scoutCache_;
     std::deque<GenKey> scoutOrder_;

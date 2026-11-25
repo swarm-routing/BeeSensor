@@ -328,21 +328,33 @@ void TestNoScoutRetryWithoutWaitingEvents(Checker& c) {
 }
 
 void TestSinkSwarmGroupsBounded(Checker& c) {
-    Config config;
-    config.forwardingTableSize = 2;
-    Solo s(true, config);
-    for (std::uint32_t g = 1; g <= 20; ++g) {
-        auto out = s.router.onForwardScout(ForwardScout{g, 0, 2, kEnergyUnset}, 5);
-        if (out.size() < 2 || !out[1].message) continue;
-        const auto& b = std::get<BackwardScout>(*out[1].message);
-        DataHeader h{0, b.sink, b.pathId, 2, kEnergyUnset};
-        s.router.onData(h, 5);
+    for (const bool cancellable : {true, false}) {
+        const std::string which = cancellable ? "cancellable timers" : "schedule() only";
+        Config config;
+        config.forwardingTableSize = 2;
+        Solo s(true, config);
+        s.timers.cancellable = cancellable;
+        std::vector<Decision> sent;
+        s.router.setControlSink([&](const Decision& d) { sent.push_back(d); });
+        for (std::uint32_t g = 1; g <= 20; ++g) {
+            s.clock.t = 0.01 * g;  // all within one sink wait
+            auto out = s.router.onForwardScout(ForwardScout{g, 0, 2, kEnergyUnset}, 5);
+            if (out.size() < 2 || !out[1].message) continue;
+            const auto& b = std::get<BackwardScout>(*out[1].message);
+            DataHeader h{0, b.sink, b.pathId, 2, kEnergyUnset};
+            s.router.onData(h, 5);
+        }
+        c.expect(s.router.waitingGroups() <= 2,
+                 which + ": pending swarm groups follow the forwarding table's cap (" +
+                     std::to_string(s.router.waitingGroups()) + ")");
+        c.expect(s.timers.pending() <= 1, which + ": one swarm timer at a time (" +
+                                              std::to_string(s.timers.pending()) + " pending)");
+        s.timers.advance(1.0);
+        c.expect(sent.size() == 2, which + ": the two surviving groups leave as swarms (" +
+                                       std::to_string(sent.size()) + ")");
+        c.expect(s.router.waitingGroups() == 0 && s.timers.pending() == 0,
+                 which + ": nothing is left pending afterwards");
     }
-    c.expect(s.router.waitingGroups() <= 2,
-             "pending swarm groups follow the forwarding table's cap (" +
-                 std::to_string(s.router.waitingGroups()) + ")");
-    c.expect(s.timers.pending() <= 2, "and their swarm timers are cancelled with them (" +
-                                          std::to_string(s.timers.pending()) + " pending)");
 }
 
 void TestForgMeasuredFromLastReturn(Checker& c) {

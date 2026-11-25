@@ -158,11 +158,9 @@ void Router::rememberScout(const GenKey& key, NodeAddress from) {
 
 std::map<Router::PathKey, Router::Forwarding>::iterator
 Router::eraseForwarding(std::map<PathKey, Forwarding>::iterator it) {
-    // a sink's foragers waiting on this path go with it, and so does their swarm timer
-    if (auto w = waiting_.find(it->first); w != waiting_.end()) {
-        timers_.cancel(w->second.timer);
-        waiting_.erase(w);
-    }
+    // a sink's foragers waiting on this path go with it (the one swarm timer
+    // finds nothing for them when it fires)
+    waiting_.erase(it->first);
     return forwarding_.erase(it);
 }
 
@@ -329,14 +327,12 @@ Decision Router::onData(DataHeader& header, NodeAddress /*from*/) {
         // the sink: the forager waits to return in a swarm
         const PathKey key{header.sink, header.pathId};
         auto [w, fresh] = waiting_.try_emplace(key);
+        if (fresh) w->second.due = now() + config_.sinkSwarmWait;
         w->second.source = header.source;
         if (w->second.foragers < 0xFFFF) ++w->second.foragers;
         w->second.hops = std::max(w->second.hops, header.hops);
         w->second.energy = minEnergy(w->second.energy, header.energy);
-        if (fresh) {
-            w->second.timer =
-                timers_.scheduleCancellable(config_.sinkSwarmWait, [this, key] { sendSwarm(key); });
-        }
+        armSwarmTimer();
         if (observer_) observer_->onDataDecision(header.sink, RouteAction::Deliver);
         return Decision::deliver();
     }
@@ -362,6 +358,28 @@ void Router::sendSwarm(PathKey key) {
     f->second.at = now();
     sent(Kind::Swarm, false);
     if (controlSink_) controlSink_(Decision::unicast(f->second.prevHop, s));
+}
+
+void Router::armSwarmTimer() {
+    // one timer for every waiting group, set for the earliest departure: what
+    // is pending stays bounded whether or not the scheduler can cancel
+    if (swarmTimerArmed_ || waiting_.empty()) return;
+    Time earliest = waiting_.begin()->second.due;
+    for (const auto& [key, w] : waiting_)
+        earliest = std::min(earliest, w.due);
+    swarmTimerArmed_ = true;
+    timers_.schedule(std::max<Time>(0.0, earliest - now()), [this] { onSwarmTimer(); });
+}
+
+void Router::onSwarmTimer() {
+    swarmTimerArmed_ = false;
+    std::vector<PathKey> due;
+    for (const auto& [key, w] : waiting_) {
+        if (w.due <= now()) due.push_back(key);
+    }
+    for (const PathKey& key : due)
+        sendSwarm(key);
+    armSwarmTimer();
 }
 
 Decision Router::onSwarm(const Swarm& swarm, NodeAddress /*from*/) {

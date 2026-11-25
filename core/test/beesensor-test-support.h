@@ -55,6 +55,8 @@ public:
     }
     swarm::core::TimerHandle scheduleCancellable(Time delay,
                                                  std::function<void()> callback) override {
+        // without cancellation: swarm-core's default contract (schedule, kNoTimer)
+        if (!cancellable) return ITimerScheduler::scheduleCancellable(delay, std::move(callback));
         const swarm::core::TimerHandle h = ++lastHandle_;
         pending_.emplace(clock_.t + delay, Entry{h, std::move(callback)});
         return h;
@@ -65,6 +67,8 @@ public:
     }
     /// Timers scheduled and not yet run or cancelled.
     std::size_t pending() const { return pending_.size(); }
+    /// False: behave as a scheduler that implements only schedule().
+    bool cancellable = true;
     /// Runs every timer due by `until`, in deadline order, moving the clock.
     void advance(Time until) {
         while (!pending_.empty() && pending_.begin()->first <= until) {
