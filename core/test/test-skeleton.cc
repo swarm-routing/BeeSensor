@@ -7,7 +7,6 @@
 #include "beesensor-core.h"
 #include "swarm-ports.h"
 
-#include <array>
 #include <cmath>
 #include <limits>
 #include <string_view>
@@ -37,19 +36,6 @@ void TestSwarmCoreReachable(Checker& c) {
     const swarm::core::IEnergy& port = energy;
     c.expect(std::isnan(port.residualEnergyFraction()),
              "swarm-core's IEnergy port is reachable from core/");
-}
-
-namespace {
-
-constexpr std::array<NamedTest, 2> kTests{{
-    {"skeleton: version() is the package's", TestVersionIsThePackages},
-    {"skeleton: swarm-core's energy port is reachable", TestSwarmCoreReachable},
-}};
-
-}  // namespace
-
-std::span<const NamedTest> AllTests() {
-    return kTests;
 }
 
 }  // namespace beesensor::core::test
