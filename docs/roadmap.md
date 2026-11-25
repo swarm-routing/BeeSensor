@@ -7,10 +7,17 @@ as ARA, BeeAdHoc and HOPNET use it. The cross-repo release train is in the
 [org ROADMAP](https://github.com/swarm-routing/.github/blob/main/ROADMAP.md).
 Issue state is always truer than a checked-in diagram.
 
-The ladder is **proposed**: epic #3 is deferred until the maintainer re-plans
-it (decision 23 on swarm-routing/.github#672), so no release here is
-scheduled, and no issue carries a `release:` label yet. Releases are cut on
-the maintainer's request only (CONTRIBUTING "Cutting a release").
+The ladder is **proposed**. Epic #3's deferral (decision 23 on
+swarm-routing/.github#672) is lifted for setup and a building, tested
+skeleton only
+([2026-11-24](https://github.com/swarm-routing/.github/issues/881#issuecomment-7147054971);
+the org ROADMAP, decision 23 as amended). The fidelity sheet and the first
+`core/` are a v0 from public secondary sources, since the papers are closed
+([2026-11-24](https://github.com/swarm-routing/.github/issues/881#issuecomment-7147077907)).
+v0.1.0 is cut only on the maintainer's word, and its release notes say it is
+v0 from secondary sources and list the rows that wait on the paper. No release
+is scheduled, and no issue carries a `release:` label yet. Releases are cut
+on the maintainer's request only (CONTRIBUTING "Cutting a release").
 
 ## How this plan is tracked
 
@@ -53,28 +60,28 @@ Amber is planned; nothing is shipped.
 ```mermaid
 flowchart TB
     subgraph BS["BeeSensor"]
-        LIT["#25 the papers read,<br/>references.bib"]
-        FID["docs/fidelity.md<br/>reviewed"]
-        CORE["core/ epic<br/>(ConvergecastScorer, scouts, foragers)"]
+        FID["docs/fidelity.md v0<br/>(public sources) reviewed"]
+        CORE["core/ v0 epic #40<br/>(scouts, foragers, swarms)"]
         NS3["ns3/ module beesensor"]
         SMOKE["delivery smoke + pipeline"]
+        LIT["the papers in hand:<br/>rows re-checked"]
         ANCHOR["anchor, or a written<br/>infeasibility verdict"]
     end
     SC["swarm-routing/swarm-core<br/>(energy port release)"]
     FAM["swarm-routing/sim-tools#55<br/>WSN convergecast family"]
-    PLAN["swarm-routing/.github#672<br/>(epic #3 re-planned)"]
 
-    LIT --> FID --> CORE
-    PLAN --> CORE
+    FID --> CORE
     SC --> CORE --> NS3 --> SMOKE --> ANCHOR
     FAM --> SMOKE
+    LIT --> ANCHOR
+    LIT -.->|"re-check v0"| FID
 ```
 
 ## What each release must show to ship
 
 | Release | Exit criteria |
 |---|---|
-| **v0.1.0** "ungated" | `docs/fidelity.md` reviewed by the maintainer, with [SUF12] as its primary version and every row cited, a repo choice or `unknown` (golden rule 10); the first `core/` slice (the CMake package `beesensor-core` on swarm-core's vcpkg port, with its tests, `core.yml` green); `docs/`. Released before the comparator gates: its release notes say no number from it counts as a benchmark result. |
+| **v0.1.0** "ungated" | `docs/fidelity.md` reviewed (for the v0 from public sources, CodeRabbit's review plus green required checks; golden rule 10), with [SUF12] as its primary version and every row cited, a repo choice or `unknown`; `core/` v0 (the CMake package `beesensor-core` on swarm-core's vcpkg port, with its tests, `core.yml` green); `docs/`. Released before the comparator gates and only on the maintainer's word: its release notes say it is v0 from secondary sources, list the rows waiting on the paper, and say no number from it counts as a benchmark result. |
 | **v0.2.0** "gated" | The ns-3 module `beesensor` is green on `ns3-dev:latest-{debug,sanitized}`; the swarm-core router observer is adopted; the repository has its own benchmark pipeline on the org reusable cell workflow, with a paired delivery smoke on the WSN convergecast family (swarm-routing/sim-tools#55); the anchor reproducing [SUF12]'s own trend gives a verdict, PASS or a written infeasibility verdict (org golden rule 6); the `unknown` rows that `core/` and the anchor depend on are each a repo choice or a recorded decision. |
 | **v0.3.0** "reviewed" | The fidelity sheet is re-checked against [SUF12] and [SF07] end to end; any new mechanism is default-off with its own A/B. |
 | **v1.0.0** | Wire format and `core/` API frozen; a released run is recorded in the benchmarks global suite. |

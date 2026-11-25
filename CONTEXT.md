@@ -6,13 +6,20 @@ section a task needs, not the whole file.
 
 ## Current state
 
-**Status: planned; fidelity sheet first.** The repository carries the org
-templates, the release ladder ([`docs/roadmap.md`](docs/roadmap.md)), the
-release workflow and the start of the fidelity sheet
-([`docs/fidelity.md`](docs/fidelity.md)), with no protocol code. Epic #3 was
-deferred on 2026-11-22 (decision 23 on swarm-routing/.github#672): the
-fidelity sheet may continue, `core/` code waits until the maintainer re-plans
-it.
+**Status: v0 fidelity sheet; empty `core/` skeleton.** The repository
+carries the org templates, the release ladder
+([`docs/roadmap.md`](docs/roadmap.md)), the release workflow, the empty,
+tested `core/` skeleton (package `beesensor-core`), and the fidelity sheet
+([`docs/fidelity.md`](docs/fidelity.md)). Epic #3 was deferred on 2026-11-22
+(decision 23 on swarm-routing/.github#672); the maintainer lifted that
+deferral for setup and a building, tested skeleton on 2026-11-24
+(https://github.com/swarm-routing/.github/issues/881#issuecomment-7147054971).
+The same day the maintainer decided that a protocol without an open paper is
+built first from public sources
+(https://github.com/swarm-routing/.github/issues/881#issuecomment-7147077907;
+both are in the org ROADMAP, decision 23 as amended). BeeSensor's sheet is therefore a v0 from
+open secondary descriptions, and `core/` follows it after review (#40). The
+anchor gate stays open and there is no release.
 
 History of the scope: swarm-routing/.github#54 first listed BeeSensor as out
 of scope, as part of the ruled-out low-power duty-cycled radio family
