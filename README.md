@@ -53,7 +53,7 @@ What is planned and in progress here: the issues labelled [`epic`](https://githu
 | Epic | Status | Sub-issues closed |
 |------|--------|-------------------|
 | [#3](https://github.com/swarm-routing/BeeSensor/issues/3) Bootstrap BeeSensor protocol on swarm-core (ConvergecastScorer, fidelity, WSN battery-drain benchmarks) | In progress | 1 / 2 |
-| [#40](https://github.com/swarm-routing/BeeSensor/issues/40) core/: BeeSensor's simulator-free C++ core on swarm-core (package beesensor-core) | In progress | 1 / 1 |
+| [#40](https://github.com/swarm-routing/BeeSensor/issues/40) core/: BeeSensor's simulator-free C++ core on swarm-core (package beesensor-core) | In progress | 1 / 2 |
 
 <!-- epics:end -->
 
