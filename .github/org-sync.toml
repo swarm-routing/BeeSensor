@@ -24,6 +24,11 @@ ruleset = "protocol"
 # Only checks that run on every PR (pull_request and merge_group). core/'s checks (core.yml,
 # swarm-core-pin.yml) are in since #42; add the ns-3 checks once ns3.yml exists.
 required_checks = ["check / org-sync", "headers / licence", "title / title", "core", "swarm-core / pin", "review / coderabbit"]
+# Run on main but gate nothing, as in ARA and BeeAdHoc, which require none of them
+# (swarm-routing/.github#774): reports (Scorecard, CodeQL, Sonar), doxygen (pull_request and
+# push only, no merge_group, so requiring it would stall the queue), the main-only
+# security-autofix and notify jobs, and CodeRabbit's own check run (review / coderabbit gates).
+optional_checks = ["analysis / Scorecard analysis", "Analyze (*)", "autofix / pick", "CodeRabbit", "doxygen / doxygen", "notify", "SonarCloud Code Analysis"]
 # Merge through a merge queue (swarm-routing/.github#130); every workflow behind a required
 # check also runs on merge_group.
 merge_queue = true
